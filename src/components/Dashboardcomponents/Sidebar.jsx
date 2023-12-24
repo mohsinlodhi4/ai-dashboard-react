@@ -10,6 +10,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import HelpIcon from "@mui/icons-material/Help";
 import { Link } from "react-router-dom";
+import { logout } from "../../utils/functions";
 
 export default function Sidebar() {
   return (
@@ -182,13 +183,13 @@ export default function Sidebar() {
                 </Link>
               </li>
               <li>
-                <a
-                  className="w-full flex items-center gap-x-3.5 py-2 px-3  text-[#8a8a8a] text-base rounded-lg hover:bg-gray-100 "
-                  href="#"
+                <span
+                  className="cursor-pointer w-full flex items-center gap-x-3.5 py-2 px-3  text-[#8a8a8a] text-base rounded-lg hover:bg-gray-100 "
+                  onClick={logout}
                 >
                   <LogoutIcon className="text-black" />
                   Logout
-                </a>
+                </span>
               </li>
               <li>
                 <Link to="/help">

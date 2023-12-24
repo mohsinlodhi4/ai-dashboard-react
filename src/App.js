@@ -12,24 +12,46 @@ import Imageandvideo from "./pages/dashboard/Imageandvideo";
 import ContentWriting from "./pages/dashboard/ContentWriting";
 import HistoryandResult from "./pages/dashboard/HistoryandResult";
 import Chatbot from "./pages/dashboard/Chatbot";
+import {NotFound} from './pages/404/NotFound';
+
+import GuestMiddleware from "./middleware/GuestMiddleware";
+import AuthMiddleware from "./middleware/AuthMiddleware";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <div className="App">
+
+      <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
+
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashborad" element={<Dashboard />} />
-          <Route path="/setting" element={<Setting />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/digital-ads" element={<Digitalads />} />
-          <Route path="/imageandvideo" element={<Imageandvideo />} />
-          <Route path="/content-writing" element={<ContentWriting />} />
-          <Route path="/history-result" element={<HistoryandResult />} />
-          <Route path="/chatbot" element={<Chatbot />} />
+          <Route path="/" element={ <GuestMiddleware> <Login /> </GuestMiddleware>} />
+          <Route path="/signup" element={ <GuestMiddleware> <Signup /> </GuestMiddleware>} />
+
+          <Route path="/dashboard" element={<AuthMiddleware> <Dashboard /> </AuthMiddleware>} />
+          <Route path="/setting" element={ <AuthMiddleware> <Setting /> </AuthMiddleware>} />
+          <Route path="/help" element={ <AuthMiddleware> <Help /> </AuthMiddleware>} />
+          <Route path="/profile" element={ <AuthMiddleware> <Profile /> </AuthMiddleware>} />
+          <Route path="/analytics" element={ <AuthMiddleware> <Analytics /> </AuthMiddleware>} />
+          <Route path="/digital-ads" element={ <AuthMiddleware> <Digitalads /> </AuthMiddleware>} />
+          <Route path="/imageandvideo" element={ <AuthMiddleware> <Imageandvideo /> </AuthMiddleware>} />
+          <Route path="/content-writing" element={ <AuthMiddleware> <ContentWriting /> </AuthMiddleware>} />
+          <Route path="/history-result" element={ <AuthMiddleware> <HistoryandResult /> </AuthMiddleware>} />
+          <Route path="/chatbot" element={ <AuthMiddleware> <Chatbot /> </AuthMiddleware>} />
+          <Route path='*' element={<NotFound />} />
+
         </Routes>
       </BrowserRouter>
     </div>

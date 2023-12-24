@@ -1,7 +1,50 @@
-import React from "react";
+import React, {useState} from "react";
 import { Link } from "react-router-dom";
+import { notifyError, notifySuccess } from "@/utils/functions";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { postRequest } from "@/utils/api";
+import { setUser } from "@/redux/authReducer/authSlice";
 
 export default function Loginform() {
+  const [logUser, setLogUser] = useState({
+    email: '',
+    password: '',
+    
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setLogUser({ ...logUser, [name]: value });
+  };
+
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+
+    try {
+      if(!logUser.email || !logUser.password) return notifyError("All fields are required");
+
+      const {data} = await postRequest(process.env.REACT_APP_API_URL + '/api/auth/login/user', logUser); 
+      const user = data.data.user
+      localStorage.setItem('user', JSON.stringify(user));
+      dispatch(setUser(user));
+      notifySuccess('Login successful');
+      navigate('/dashboard');
+      return true; 
+      
+    } catch (error) {
+      console.log(error)
+      let message = error?.data?.message || 'Invalid credentials' 
+      notifyError(message);
+    }
+  }
+
   return (
     <div className="h-screen">
       <div className=" bg-gray-100 flex h-full items-center py-16">
@@ -30,7 +73,7 @@ export default function Loginform() {
                   Or
                 </div>
 
-                <form>
+                <form onSubmit={handleSubmit}>
                   <div className="grid gap-y-4">
                     <div>
                       <label
@@ -41,6 +84,7 @@ export default function Loginform() {
                       </label>
                       <div className="relative">
                         <input
+                          onChange={handleChange}
                           type="email"
                           id="email"
                           name="email"
@@ -86,6 +130,7 @@ export default function Loginform() {
                       </div>
                       <div className="relative">
                         <input
+                          onChange={handleChange}
                           type="password"
                           id="password"
                           name="password"
@@ -128,14 +173,12 @@ export default function Loginform() {
                         </label>
                       </div>
                     </div>
-                    <Link to="/dashborad">
                       <button
                         type="submit"
                         className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none "
                       >
                         Sign in
                       </button>
-                    </Link>
                   </div>
                 </form>
               </div>

@@ -1,7 +1,57 @@
-import React from "react";
+import React, {useState} from "react";
 import { Link } from "react-router-dom";
+import { notifyError, notifySuccess } from "@/utils/functions";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { postRequest } from "@/utils/api";
+import { setUser } from "@/redux/authReducer/authSlice";
 
 export default function Signupform() {
+
+  const [newUser, setNewUser] = useState({
+    name:'',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewUser({ ...newUser, [name]: value });
+  };
+  
+ 
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+      try {
+
+        if(!newUser.password) {
+          return notifyError("All fields are required.")
+        }
+
+        if(newUser.password != newUser.confirmPassword) {
+          return notifyError("Confirm Password does not match with the password")
+        }
+
+        const {data} = await postRequest(process.env.REACT_APP_API_URL +'/api/auth/register/user', newUser)
+        const user = data.data.user
+        localStorage.setItem('user', JSON.stringify(user));
+        dispatch(setUser(user));
+        notifySuccess('Registration successfull.');
+        navigate('/dashboard');
+        return true; 
+      } catch (error) {
+        let message = error?.data?.message || 'Invalid credentials' 
+        notifyError(message);
+      }
+     
+  }
+
   return (
     <div className="h-screen">
       <div className=" bg-gray-100 flex h-full items-center py-16">
@@ -30,8 +80,45 @@ export default function Signupform() {
                   Or
                 </div>
 
-                <form>
+                <form onSubmit={handleSubmit}>
                   <div className="grid gap-y-4">
+                    <div>
+                      <label
+                        htmlFor="name"
+                        className="block text-sm text-left mb-2 "
+                      >
+                        Name
+                      </label>
+                      <div className="relative">
+                        <input
+                          onChange={handleChange}
+                          type="text"
+                          id="name"
+                          name="name"
+                          className="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none "
+                          required
+                          aria-describedby="name-error"
+                        />
+                        <div className="hidden absolute inset-y-0 end-0 flex items-center pointer-events-none pe-3">
+                          <svg
+                            className="h-5 w-5 text-red-500"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                            aria-hidden="true"
+                          >
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+                          </svg>
+                        </div>
+                      </div>
+                      <p
+                        className="hidden text-xs text-red-600 mt-2"
+                        id="name-error"
+                      >
+                        Please enter your name
+                      </p>
+                    </div>
                     <div>
                       <label
                         htmlFor="email"
@@ -41,6 +128,7 @@ export default function Signupform() {
                       </label>
                       <div className="relative">
                         <input
+                          onChange={handleChange}
                           type="email"
                           id="email"
                           name="email"
@@ -78,6 +166,7 @@ export default function Signupform() {
                       </label>
                       <div className="relative">
                         <input
+                          onChange={handleChange}
                           type="password"
                           id="password"
                           name="password"
@@ -107,19 +196,20 @@ export default function Signupform() {
                     </div>
                     <div>
                       <label
-                        htmlFor="confirm-password"
+                        htmlFor="confirmPassword"
                         className="block text-sm mb-2 text-left "
                       >
                         Confirm Password
                       </label>
                       <div className="relative">
                         <input
+                          onChange={handleChange}
                           type="password"
-                          id="confirm-password"
-                          name="confirm-password"
+                          id="confirmPassword"
+                          name="confirmPassword"
                           className="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none "
                           required
-                          aria-describedby="confirm-password-error"
+                          aria-describedby="confirmPassword-error"
                         />
                         <div className="hidden absolute inset-y-0 end-0 flex items-center pointer-events-none pe-3">
                           <svg
@@ -136,9 +226,9 @@ export default function Signupform() {
                       </div>
                       <p
                         className="hidden text-xs text-red-600 mt-2"
-                        id="confirm-password-error"
+                        id="confirmPassword-error"
                       >
-                        Password does not match the password
+                        Confirm password does not match the password
                       </p>
                     </div>
                     <div className="flex items-center">
@@ -162,14 +252,12 @@ export default function Signupform() {
                         </label>
                       </div>
                     </div>
-                    <Link to="/dashborad">
                       <button
                         type="submit"
                         className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none "
                       >
                         Sign up
                       </button>
-                    </Link>
                   </div>
                 </form>
               </div>
