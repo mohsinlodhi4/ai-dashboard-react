@@ -166,7 +166,7 @@ export default function Chatbot() {
               <p className="font-bold text-base">Chatbot Color</p>
               <HelpOutlineIcon style={{ fontSize: 18 }} />
             </div> */}
-            <div>
+            <div style={{padding: "1px"}}>
               <div className="relative">
                 <textarea
                   id="hs-textarea-ex-1"
