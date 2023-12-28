@@ -10,7 +10,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 // import {getRequest } from 'E:\Mohsin\ai-dashboard-react-main\src\utils\api.js'
 import { getRequest, postRequest } from '../../utils/api'
 import Loader from "../../components/LoaderComponent/Loader";
-
+import './Chatbot.css'
 export default function Chatbot() {
   const [colorHEX, setColorHEX] = useState("6466f1");
   const [chatList, setChatList] = useState([]);
@@ -18,6 +18,7 @@ export default function Chatbot() {
   const [inputValue, setInputValue] = useState('');
   const [sessionId, setSessionId] = useState('')
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState(null);
   //Get list of sidebar 
   const getList = async () => {
     setLoading(true);
@@ -40,6 +41,7 @@ export default function Chatbot() {
   const onListClick = (title) => {
     const { _id } = title
     listdata(_id)
+    setActiveTab(title);
   }
 
   //For new data send
@@ -58,7 +60,8 @@ export default function Chatbot() {
       title: value
     }
     const answer = {
-      content: res?.data?.data?.message?.content
+      content: res?.data?.data?.message?.content,
+      createdAt: res?.data?.data?.message?.createdAt
     }
     chatListData.push(question)
     chatListData.push(answer)
@@ -106,8 +109,10 @@ export default function Chatbot() {
           <div style={{ maxHeight: "500px", overflow: "scroll", overflowX: "hidden" }} className="py-6 px-5 border-r border-gray-500 lg:w-[20%] flex flex-col gap-6">
             {chatList?.map((item, index) => {
               const { title } = item
+              const isActive = activeTab === item;
               return (
-                <div key={index} onClick={() => { onListClick(item) }} style={{ cursor: "pointer", border: "1px solid", borderRadius: "5px", padding: "5px" }} className="flex flex-row items-center gap-3">
+                <div key={index} 
+                className={`chat-list flex flex-row items-center gap-3 ${isActive ? 'active-tab' : ''}`} onClick={() => { onListClick(item) }} >
                   <div className="">
                     <h3 className="text-sm font-bold">{title}</h3>
                     {/* <p className="text-sm">Ul and UX of chatbot</p> */}
@@ -121,6 +126,7 @@ export default function Chatbot() {
             <div style={{
               position: "relative",
               minHeight: "480px",
+              maxHeight: "480px",
               border: "1px solid grey",
               borderRadius: "5px",
               padding: "10px",

@@ -1,0 +1,29 @@
+.scroll-container:hover {
+    overflow-y: scroll;  /* Show the scrollbar on hover */
+  }
+
+  .chat-list{
+    cursor: pointer;
+    border: 1px solid;
+    border-radius: 5px;
+    padding: 10px;
+    max-width: 209px;
+    min-height: 40px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .chat-list:hover{
+    color: white;
+    background: #000;
+  }
+  .active-tab{
+    color: white;
+    background: #000;
+  }
+
+  @media screen and (max-width: 768px) and (max-height: 528px) {
+    .chat-list{
+        max-width: none;
+      }
+  }

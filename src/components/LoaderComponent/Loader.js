@@ -8,7 +8,7 @@ const Loader = () => {
     //   <div className="loader"></div>
     // </div>
     
-<div class="loader"></div>
+<div className="loader"></div>
   )
 }
 
