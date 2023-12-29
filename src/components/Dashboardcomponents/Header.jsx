@@ -1,8 +1,9 @@
 import React from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
-
+import { useSelector } from "react-redux";
 export default function Header() {
+  const user = useSelector(state => state.auth.user)
   return (
     <header className="sticky top-0 inset-x-0 flex flex-wrap sm:justify-start sm:flex-nowrap z-[48] w-full bg-black border-b text-sm py-2.5 sm:py-5 ">
       <nav
@@ -54,7 +55,7 @@ export default function Header() {
 
         <div className="flex flex-row items-center justify-end gap-5">
           <div className="">
-            <h3 className="text-white font-bold text-lg">Business Name</h3>
+            <h3 className="text-white font-bold text-lg">{user.name}</h3>
           </div>
           <div>
             <button

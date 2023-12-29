@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Header from "../../components/Dashboardcomponents/Header";
 import Sidebar from "../../components/Dashboardcomponents/Sidebar";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
@@ -11,6 +11,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { getRequest, postRequest } from '../../utils/api'
 import Loader from "../../components/LoaderComponent/Loader";
 import './Chatbot.css'
+import { notifyError } from "../../utils/functions";
 export default function Chatbot() {
   const [colorHEX, setColorHEX] = useState("6466f1");
   const [chatList, setChatList] = useState([]);
@@ -18,20 +19,26 @@ export default function Chatbot() {
   const [inputValue, setInputValue] = useState('');
   const [sessionId, setSessionId] = useState('')
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(null);
+  const messagesEndRef = useRef(null)
   //Get list of sidebar 
   const getList = async () => {
     setLoading(true);
-    const res = await getRequest('http://localhost:5000/api/chat/list')
+    const res = await getRequest(process.env.REACT_APP_API_URL +'/api/chat/list')
     setChatList(res?.data?.data?.messages)
     setLoading(false);
   }
+
+  const formatMessageContent = useCallback((content)=> {
+    if(!content) return <></>;
+
+    return content.replaceAll("\t","   ").split("\n").map(con => <p>{con}</p>)
+  } );
 
   //Retrieve detail data of list from sidebar
   const listdata = async (id) => {
     setLoading(true);
 
-    const res = await getRequest(`http://localhost:5000/api/chat/${id}`)
+    const res = await getRequest(process.env.REACT_APP_API_URL +`/api/chat/${id}`)
     setChatListData(res?.data?.data?.message?.messages)
     setSessionId(id)
     setLoading(false);
@@ -41,30 +48,43 @@ export default function Chatbot() {
   const onListClick = (title) => {
     const { _id } = title
     listdata(_id)
-    setActiveTab(title);
   }
 
   //For new data send
   const onSend = async (value) => {
-    if (value === '') return
+    if (value === '' || value.trim() == '') return
     setLoading(true);
     const data = {
       text: value,
       sessionId: sessionId
     }
-    const res = await postRequest('http://localhost:5000/api/chat/send-message', data)
-    setSessionId(res?.data?.sessionId)
-    //Continue for handle newdata
-    const question = {
-      content: value,
-      title: value
+    try {
+      const res = await postRequest(process.env.REACT_APP_API_URL +'/api/chat/send-message', data)
+      //Continue for handle newdata
+      const question = {
+        content: value,
+        title: value
+      }
+      const answer = {
+        content: res?.data?.data?.message?.content,
+        createdAt: res?.data?.data?.message?.createdAt
+      }
+      setChatListData(prev => [...prev, question, answer])
+
+      let newSessionId = res?.data?.data?.sessionId
+      if(!sessionId || sessionId.toString() != newSessionId) {
+        setSessionId(newSessionId)
+        setChatList(prev => [{
+          _id: newSessionId, 
+          title: value.length ==20 ? value+ '...': value ,
+          createdAt: res?.data?.data?.message?.createdAt
+        }, ...prev])
+      }
+    } catch(e) {
+      let message = e.message || e?.data?.message || e?.data?.data?.message || "Something went wrong";
+      notifyError(message)
     }
-    const answer = {
-      content: res?.data?.data?.message?.content,
-      createdAt: res?.data?.data?.message?.createdAt
-    }
-    chatListData.push(question)
-    chatListData.push(answer)
+    
     setLoading(false);
 
   }
@@ -78,6 +98,11 @@ export default function Chatbot() {
   useEffect(() => {
     getList();
   }, [])
+  
+  useEffect(()=>{
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [sessionId])
+  
   return (
     <div>
       <Header />
@@ -101,15 +126,15 @@ export default function Chatbot() {
           {/* <a href="#"> */}
           <h3 className="text-xl font-bold">Chat History</h3>
           {/* </a> */}
-          {/* <a className="text-white bg-[#1E429F] px-5 py-2 rounded" href="#">
-            <h3 className="text-xl font-bold">Share</h3>
-          </a> */}
+          <span onClick={()=>{ setSessionId(null); setChatListData([])} } className="cursor-pointer text-white bg-[#1E429F] px-5 py-2 rounded" >
+          <h3 className="text-xl font-bold">New Chat</h3>
+          </span>
         </div>
         <div className="flex flex-col lg:flex-row">
           <div style={{ maxHeight: "500px", overflow: "scroll", overflowX: "hidden" }} className="py-6 px-5 border-r border-gray-500 lg:w-[20%] flex flex-col gap-6">
             {chatList?.map((item, index) => {
               const { title } = item
-              const isActive = activeTab === item;
+              const isActive = sessionId?.toString() === item?._id?.toString();
               return (
                 <div key={index} 
                 className={`chat-list flex flex-row items-center gap-3 ${isActive ? 'active-tab' : ''}`} onClick={() => { onListClick(item) }} >
@@ -146,7 +171,7 @@ export default function Chatbot() {
                 });
                 return (
                   <>
-                    <div style={{fontWeight: index % 2 === 0 ? "bold" : "normal"}} key={index}>{content}</div>
+                    <div style={{fontWeight: index % 2 === 0 ? "bold" : "normal"}} key={index}>{formatMessageContent(content)}</div>
 
                       {index % 2 !== 0 &&
                         <div style={{display: "flex", justifyContent: "space-between"}}>
@@ -157,6 +182,7 @@ export default function Chatbot() {
                   </>
                 )
               })}
+              <div ref={messagesEndRef} />
               {/* <img
                 className="h-52 object-cover w-full rounded-md"
                 src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
