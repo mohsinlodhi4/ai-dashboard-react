@@ -18,7 +18,7 @@ const AuthMiddleware = ({allowedRoles,children}) => {
     //   }
     // },[user]);
 
-  return user?.token ? children : <Navigate to="/" />
+  return user?.token ? children : <Navigate to="/login" />
 }
 
 export default AuthMiddleware

@@ -13,6 +13,7 @@ import ContentWriting from "./pages/dashboard/ContentWriting";
 import HistoryandResult from "./pages/dashboard/HistoryandResult";
 import Chatbot from "./pages/dashboard/Chatbot";
 import {NotFound} from './pages/404/NotFound';
+import LandingPage from "./pages/LandingPage";
 
 import GuestMiddleware from "./middleware/GuestMiddleware";
 import AuthMiddleware from "./middleware/AuthMiddleware";
@@ -37,7 +38,8 @@ function App() {
 
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={ <GuestMiddleware> <Login /> </GuestMiddleware>} />
+          <Route path="/" element={ <LandingPage />} />
+          <Route path="/login" element={ <GuestMiddleware> <Login /> </GuestMiddleware>} />
           <Route path="/signup" element={ <GuestMiddleware> <Signup /> </GuestMiddleware>} />
 
           <Route path="/dashboard" element={<AuthMiddleware> <Dashboard /> </AuthMiddleware>} />
