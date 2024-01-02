@@ -48,8 +48,8 @@ function App() {
           <Route path="/dashboard" element={<AuthMiddleware> <Dashboard /> </AuthMiddleware>} />
           <Route path="/setting" element={ <AuthMiddleware> <Setting /> </AuthMiddleware>} />
           <Route path="/help" element={ <AuthMiddleware> <Help /> </AuthMiddleware>} />
-          <Route path="/profile" element={ <AuthMiddleware> <Profile /> </AuthMiddleware>} />
-          <Route path="/multistep" element={<MultiStep />} />
+          <Route path="/multistep" element={ <AuthMiddleware> <MultiStep /> </AuthMiddleware>} />
+          {/* <Route path="/multistep" element={<MultiStep />} /> */}
           <Route path="/analytics" element={ <AuthMiddleware> <Analytics /> </AuthMiddleware>} />
           <Route path="/digital-ads" element={ <AuthMiddleware> <Digitalads /> </AuthMiddleware>} />
           <Route path="/imageandvideo" element={ <AuthMiddleware> <Imageandvideo /> </AuthMiddleware>} />

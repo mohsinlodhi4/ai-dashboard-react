@@ -160,7 +160,7 @@ export default function Sidebar() {
           >
             <ul>
               <li>
-                <Link to="/profile">
+                <Link to="/multistep">
                   <span
                     className="flex items-center gap-x-3.5 py-2 px-3  text-[#8a8a8a] text-base rounded-lg hover:bg-gray-100 "
                     href="#"
