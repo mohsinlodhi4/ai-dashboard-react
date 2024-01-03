@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate  } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getRequest, postRequest } from "../utils/api";
-import { isProtocol,isValidUrl,notifySuccess, notifyError } from "../utils/functions";
+import { isProtocol, isValidUrl, notifySuccess, notifyError } from "../utils/functions";
+import './Multistep.css';
 export default function MultiStep() {
+  const navigate = useNavigate();
   const formArray = [1, 2, 3];
   const [formNo, setFormNo] = useState(formArray[0]);
   const [state, setState] = useState({
@@ -34,7 +36,6 @@ export default function MultiStep() {
     });
   };
   const handleForm = (e) => {
-    console.log("E", e)
     let value = e.target.value
     if (e.target.name == 'contactNumbers') {
       value = e.target.value.replace(/[^0-9]/g, '');
@@ -100,10 +101,39 @@ export default function MultiStep() {
     setFormNo(formNo - 1);
   };
   const finalSubmit = () => {
-    if (state.district && state.thana && state.post) {
-    } else {
-    }
+    navigate('/dashboard')
   };
+
+  const oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+  const handleSignIn = () => {
+    const form = document.createElement('form');
+    form.setAttribute('method', 'GET'); // Send as a GET request.
+    form.setAttribute('action', oauth2Endpoint);
+
+    const params = {
+      client_id: '194253275919-7q6a5vucqo9b84gau2ra04u51q87ndeg.apps.googleusercontent.com',
+      redirect_uri: 'http://localhost:3000/callback',
+      response_type: 'token',
+      scope: 'https://www.googleapis.com/auth/analytics.readonly',
+      include_granted_scopes: 'true',
+      state: 'pass-through value',
+    };
+
+    // Add form parameters as hidden input values.
+    for (const key in params) {
+      const input = document.createElement('input');
+      input.setAttribute('type', 'hidden');
+      input.setAttribute('name', key);
+      input.setAttribute('value', params[key]);
+      form.appendChild(input);
+    }
+
+    // Add form to the page and submit it to open the OAuth 2.0 endpoint.
+    document.body.appendChild(form);
+    form.submit();
+  };
+
   return (
     <div className=" bg-gray-100 flex md:flex-row items-center flex-col h-[100vh]">
       <div className="md:w-[50%] p-10">
@@ -128,24 +158,18 @@ export default function MultiStep() {
               <div className="mt-4 flex justify-center items-center">
                 <button
                   onClick={next}
-                  className={`px-3 py-2 text-lg rounded-md w-full text-white bg-[#1C64F2] 
-                  ${isLoading ? 'disabled' : ''}`}
+                  className={`px-3 py-2 text-lg rounded-md w-full text-white bg-[#1C64F2] ${isLoading ? 'disabled' : ''
+                    }`}
                   disabled={isLoading}
                 >
-                  {isLoading ? (
-                    <span
-                      className="spinner-border spinner-border-sm mr-2"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                  ) : null}
+                  {isLoading && (
+                    <span style={{display: "inline-block"}} className="custom-loader" role="status" aria-hidden="true"></span>
+                  )}
                   Next
-
                 </button>
               </div>
             </div>
           )}
-          {console.log("FORMDATA", formData)}
 
           {formNo === 2 && (
             <div>
@@ -290,7 +314,7 @@ export default function MultiStep() {
               </div>
               <div className="mt-4 gap-3 flex flex-row justify-center items-center">
                 <button
-                  onClick={pre}
+                  onClick={handleSignIn}
                   className="px-3 py-2 text-lg rounded-md w-full text-white bg-[#1C64F2]"
                 >
                   Integrate
