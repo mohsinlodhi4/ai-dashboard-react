@@ -1,7 +1,3 @@
-import {  toast } from 'react-toastify';
-
-  import 'react-toastify/dist/ReactToastify.css';
-
 export const isProtocol = (url) => {
     return url.startsWith("http://") || url.startsWith("https://") ?
         url
@@ -23,10 +19,3 @@ export const isValidUrl = (inputUrl = null, acceptOnly = [], notAllow = []) => {
     if (res) return true;
     return false
 }
-
-// export const notifyError = (msg, title=Content.errorTitle,) => {
-//     return displayToast('error', title, msg, {autoClose: 3000, pauseOnHover: false,});
-//   }
-export const notifyError = (msg, position) => {
-    return toast(msg,{ position: position});
-  }
