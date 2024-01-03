@@ -3,8 +3,7 @@ import { Link } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getRequest, postRequest } from "../utils/api";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { isProtocol, isValidUrl, notifyError } from "../utils/helper";
+import { isProtocol,isValidUrl,notifySuccess, notifyError } from "../utils/functions";
 export default function MultiStep() {
   const formArray = [1, 2, 3];
   const [formNo, setFormNo] = useState(formArray[0]);
@@ -56,7 +55,7 @@ export default function MultiStep() {
         }
         setIsLoading(true)
         try {
-          notifyError("Web url analyzing", "top-left")
+          notifySuccess("Web url analyzing", "top-left")
           const res = await postRequest("http://localhost:5000/api/profile/submit-web-url", data)
           if (res.statusText == "OK") {
             setApiData(res?.data)
@@ -288,29 +287,20 @@ export default function MultiStep() {
                 <label htmlFor="district">
                   Initgrate your current digital tools
                 </label>
-                <textarea
-                  value={state.district}
-                  onChange={inputHandle}
-                  className="p-2 border border-slate-400 mt-1 outline-0  h-36 focus:border-blue-500 rounded-md"
-                  name="district"
-                  placeholder="Initgrate your current digital tools
-                  "
-                  id="district"
-                />
               </div>
               <div className="mt-4 gap-3 flex flex-row justify-center items-center">
                 <button
                   onClick={pre}
                   className="px-3 py-2 text-lg rounded-md w-full text-white bg-[#1C64F2]"
                 >
-                  Previous
+                  Integrate
                 </button>
                 <Link className="w-full" to="/createchatbot">
                   <button
                     onClick={finalSubmit}
                     className="px-3 py-2 text-lg rounded-md w-full text-white bg-[#1C64F2]"
                   >
-                    Submit
+                    Next
                   </button>
                 </Link>
               </div>
