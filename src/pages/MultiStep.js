@@ -15,7 +15,9 @@ export default function MultiStep() {
   const [apiData, setApiData] = useState([])
 
   const [formData, setFormData] = useState({
+    webUrl: '',
     businessTitle: '',
+    businessDescription: '',
     businessAddress: '',
     emails: '',
     contactDetails: '',
@@ -23,16 +25,17 @@ export default function MultiStep() {
     additionalInformation: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { businessTitle, businessAddress, emails, contactDetails, socialLinks, additionalInformation } = formData
-  const { webUrl } = state
+  const { webUrl, businessTitle, businessDescription, businessAddress, emails, contactDetails, socialLinks, additionalInformation } = formData
 
   const inputHandle = (e) => {
-    setState({
-      ...state,
-      [e.target.name]: e.target.value,
+    setFormData({
+      ...formData,
+      path: e.target.value,
+      url: e.target.baseURI,
     });
   };
   const handleForm = (e) => {
+    console.log("E", e)
     let value = e.target.value
     if (e.target.name == 'contactNumbers') {
       value = e.target.value.replace(/[^0-9]/g, '');
@@ -58,7 +61,15 @@ export default function MultiStep() {
           if (res.statusText == "OK") {
             setApiData(res?.data)
             // setFormData(res?.data?.data || {});
-            setFormData({ businessAddress: res?.data?.data?.addresses, contactDetails: res?.data?.data?.contactNumbers } || {});
+            setFormData({
+              ...formData,
+              businessTitle: res?.data?.data?.businessTitle,
+              businessDescription: res?.data?.data?.businessDescription,
+              businessAddress: res?.data?.data?.addresses,
+              email: res?.data?.data?.emails,
+              contactDetails: res.data.data.contactNumbers,
+              socialLinks: [res.data.data.socialLinks],
+            });
             setFormNo(formNo + 1);
           }
         } catch (error) {
@@ -70,22 +81,20 @@ export default function MultiStep() {
 
 
     } else if (formNo === 2) {
-      if (businessTitle == '' && businessAddress == '' && emails == '' && contactDetails == '' && socialLinks == '') {
+      if (businessTitle == '' || businessAddress == '' || emails == '' || contactDetails == '' || socialLinks == '') {
         notifyError("Please fill required fields", "top-left")
       } else {
-        try {
-          const res = await postRequest('http://localhost:5000/api/profile/save', formData)
-          if (res.statusText == "OK") {
-            setFormNo(formNo + 1);
-          }
-        } catch (error) {
-          console.log("ERROR", error)
-        }
+        setFormNo(formNo + 1);
       }
-      // setFormNo(formNo + 1);
-    } else if (formNo === 3 && state.logo) {
-      setFormNo(formNo + 1);
-    } else {
+    } else if (formNo === 3) {
+      try {
+        const res = await postRequest('http://localhost:5000/api/profile/save', formData)
+        if (res.statusText == "OK") {
+          setFormNo(formNo + 1);
+        }
+      } catch (error) {
+        console.log("ERROR", error)
+      }
     }
   };
   const pre = () => {
@@ -109,11 +118,11 @@ export default function MultiStep() {
               <div className="flex flex-col mb-2">
                 <input
                   value={webUrl}
-                  onChange={inputHandle}
+                  onChange={handleForm}
                   className="p-2 border border-slate-400 mt-1 outline-0 focus:border-blue-500 rounded-md"
                   type="url"
                   name="webUrl"
-                  placeholder="Enter your website address"
+                  placeholder="Enter your website url"
                   id="webUrl"
                 />
               </div>
@@ -137,6 +146,7 @@ export default function MultiStep() {
               </div>
             </div>
           )}
+          {console.log("FORMDATA", formData)}
 
           {formNo === 2 && (
             <div>
@@ -145,19 +155,32 @@ export default function MultiStep() {
                 <h4>Business Title</h4>
                 <input
                   value={businessTitle}
-                  onChange={(e) => { handleForm(e, 'businessTitle') }}
+                  onChange={handleForm}
                   className="p-2 border border-slate-400 mt-1 outline-0 focus:border-blue-500 rounded-md"
                   type="url"
                   name="businessTitle"
-                  placeholder="Enter your businessTitle"
+                  placeholder="Enter your business title"
                   id="businessTitle"
+                />
+              </div>
+              <div className="flex flex-col mb-2">
+
+                <h4>Business Description</h4>
+                <input
+                  value={businessDescription}
+                  onChange={handleForm}
+                  className="p-2 border border-slate-400 mt-1 outline-0 focus:border-blue-500 rounded-md"
+                  type="url"
+                  name="businessDescription"
+                  placeholder="Enter your business Description"
+                  id="businessDescription"
                 />
               </div>
               <div className="flex flex-col mb-2">
                 <h4>Address</h4>
                 <input
                   value={businessAddress}
-                  onChange={(e) => { handleForm(e, 'businessAddress') }}
+                  onChange={handleForm}
                   className="p-2 border border-slate-400 mt-1 outline-0 focus:border-blue-500 rounded-md"
                   type="url"
                   name="businessAddress"
@@ -169,7 +192,7 @@ export default function MultiStep() {
                 <h4>Emails</h4>
                 <input
                   value={emails}
-                  onChange={(e) => { handleForm(e, 'emails') }}
+                  onChange={handleForm}
                   className="p-2 border border-slate-400 mt-1 outline-0 focus:border-blue-500 rounded-md"
                   type="url"
                   name="emails"
@@ -181,7 +204,7 @@ export default function MultiStep() {
                 <h4>Contact Numbers</h4>
                 <input
                   value={contactDetails}
-                  onChange={(e) => { handleForm(e, 'contactDetails') }}
+                  onChange={handleForm}
                   className="p-2 border border-slate-400 mt-1 outline-0 focus:border-blue-500 rounded-md"
                   type="phone"
                   name="contactDetails"
@@ -193,7 +216,7 @@ export default function MultiStep() {
                 <h4>Social Links</h4>
                 <input
                   value={socialLinks}
-                  onChange={(e) => { handleForm(e, 'socialLinks') }}
+                  onChange={handleForm}
                   className="p-2 border border-slate-400 mt-1 outline-0 focus:border-blue-500 rounded-md"
                   type="url"
                   name="socialLinks"
@@ -202,7 +225,7 @@ export default function MultiStep() {
                 />
               </div>
               <div className="flex flex-col mb-2">
-                <h4>Additional Fields</h4>
+                <h4>Additional Information</h4>
                 <textarea
                   value={additionalInformation}
                   onChange={(e) => { handleForm(e, 'additionalInformation') }}
@@ -234,13 +257,12 @@ export default function MultiStep() {
               <div className="flex flex-col mb-2">
                 <label>Upload your Banding</label>
                 <input
-                  value={state.logo}
                   onChange={inputHandle}
                   className="mt-1  "
                   type="file"
                   accept="image/png, image/jpeg"
-                  name="logo"
-                  id="logo"
+                  name="path"
+                  id="path"
                 />
               </div>
               <div className="mt-4 gap-3 flex justify-center items-center">
