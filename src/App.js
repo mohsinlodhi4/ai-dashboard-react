@@ -17,7 +17,7 @@ import LandingPage from "./pages/LandingPage";
 import MultiStep from "./pages/MultiStep";
 import CreateChatBot from "./pages/CreateChatBot";
 import DesignYourChatbot from "./pages/DesignYourChatbot";
-
+import ChatBotList from "./pages/ChatbotList";
 import GuestMiddleware from "./middleware/GuestMiddleware";
 import AuthMiddleware from "./middleware/AuthMiddleware";
 import { ToastContainer } from 'react-toastify';
@@ -49,13 +49,13 @@ function App() {
           <Route path="/setting" element={ <AuthMiddleware> <Setting /> </AuthMiddleware>} />
           <Route path="/help" element={ <AuthMiddleware> <Help /> </AuthMiddleware>} />
           <Route path="/multistep" element={ <AuthMiddleware> <MultiStep /> </AuthMiddleware>} />
-          {/* <Route path="/multistep" element={<MultiStep />} /> */}
           <Route path="/analytics" element={ <AuthMiddleware> <Analytics /> </AuthMiddleware>} />
           <Route path="/digital-ads" element={ <AuthMiddleware> <Digitalads /> </AuthMiddleware>} />
           <Route path="/imageandvideo" element={ <AuthMiddleware> <Imageandvideo /> </AuthMiddleware>} />
           <Route path="/content-writing" element={ <AuthMiddleware> <ContentWriting /> </AuthMiddleware>} />
           <Route path="/history-result" element={ <AuthMiddleware> <HistoryandResult /> </AuthMiddleware>} />
-          <Route path="/chatbot" element={ <AuthMiddleware> <Chatbot /> </AuthMiddleware>} />
+          {/* <Route path="/chatbot" element={ <AuthMiddleware> <Chatbot /> </AuthMiddleware>} /> */}
+          <Route path="/chatbot" element={ <AuthMiddleware> <ChatBotList /> </AuthMiddleware>} />
           <Route path="/designchatbot" element={<DesignYourChatbot />} />
           <Route path="/createchatbot" element={<CreateChatBot />} />
           <Route path='*' element={<NotFound />} />

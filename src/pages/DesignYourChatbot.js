@@ -3,6 +3,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import SendIcon from "@mui/icons-material/Send";
 import ImageIcon from "@mui/icons-material/Image";
+import { Link } from "react-router-dom";
 
 export default function DesignYourChatbot() {
   return (
@@ -160,6 +161,18 @@ export default function DesignYourChatbot() {
           <p>What would you like to talk about?</p>
           <SendIcon />
         </div>
+        <div className="py-5 text-right pr-5">
+            <Link to="/createchatbot">
+              <button className="bg-[#1E429F] text-white py-3 mr-3 px-5 rounded-full">
+                Back to Edit
+              </button>
+            </Link>
+            <Link to="/chatbot">
+              <button className="bg-[#1E429F] text-white py-3 px-5 rounded-full">
+                Publish
+              </button>
+            </Link>
+          </div>
       </div>
     </div>
   );
