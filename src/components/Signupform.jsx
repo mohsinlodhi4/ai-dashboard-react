@@ -64,7 +64,7 @@ export default function Signupform() {
                 </h1>
                 <p className="mt-2 text-sm text-gray-600 ">
                   Already have an account?
-                  <Link to="/">
+                  <Link to="/login">
                     <span
                       className="text-blue-600 pl-2 decoration-2 hover:underline font-medium "
                       href="../examples/html/signin.html"

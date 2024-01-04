@@ -57,7 +57,7 @@ export default function Loginform() {
                 </h1>
                 <p className="mt-2 text-sm text-gray-600 ">
                   Don't have an account yet?
-                  <Link to="signup">
+                  <Link to="/signup">
                     <span
                       className="text-blue-600 decoration-2 pl-2 hover:underline font-medium "
                       href="../examples/html/signup.html"
