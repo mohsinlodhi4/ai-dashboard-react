@@ -24,6 +24,12 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
+
+  const checkProfileCompleted = (user)=> {
+    return user && user.profileCompleted
+  }
+  const fallbackProfileURL = '/multistep';
+
   return (
     <div className="App">
 
@@ -45,17 +51,17 @@ function App() {
           <Route path="/login" element={ <GuestMiddleware> <Login /> </GuestMiddleware>} />
           <Route path="/signup" element={ <GuestMiddleware> <Signup /> </GuestMiddleware>} />
 
-          <Route path="/dashboard" element={<AuthMiddleware> <Dashboard /> </AuthMiddleware>} />
-          <Route path="/setting" element={ <AuthMiddleware> <Setting /> </AuthMiddleware>} />
-          <Route path="/help" element={ <AuthMiddleware> <Help /> </AuthMiddleware>} />
-          <Route path="/multistep" element={ <AuthMiddleware> <MultiStep /> </AuthMiddleware>} />
-          <Route path="/analytics" element={ <AuthMiddleware> <Analytics /> </AuthMiddleware>} />
-          <Route path="/digital-ads" element={ <AuthMiddleware> <Digitalads /> </AuthMiddleware>} />
-          <Route path="/imageandvideo" element={ <AuthMiddleware> <Imageandvideo /> </AuthMiddleware>} />
-          <Route path="/content-writing" element={ <AuthMiddleware> <ContentWriting /> </AuthMiddleware>} />
-          <Route path="/history-result" element={ <AuthMiddleware> <HistoryandResult /> </AuthMiddleware>} />
-          {/* <Route path="/chatbot" element={ <AuthMiddleware> <Chatbot /> </AuthMiddleware>} /> */}
-          <Route path="/chatbot" element={ <AuthMiddleware> <ChatBotList /> </AuthMiddleware>} />
+          <Route path="/dashboard" element={<AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <Dashboard /> </AuthMiddleware>} />
+          <Route path="/setting" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <Setting /> </AuthMiddleware>} />
+          <Route path="/help" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <Help /> </AuthMiddleware>} />
+          <Route path="/multistep" element={ <AuthMiddleware > <MultiStep /> </AuthMiddleware>} />
+          <Route path="/analytics" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <Analytics /> </AuthMiddleware>} />
+          <Route path="/digital-ads" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <Digitalads /> </AuthMiddleware>} />
+          <Route path="/imageandvideo" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <Imageandvideo /> </AuthMiddleware>} />
+          <Route path="/content-writing" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <ContentWriting /> </AuthMiddleware>} />
+          <Route path="/history-result" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <HistoryandResult /> </AuthMiddleware>} />
+          {/* <Route path="/chatbot" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <Chatbot /> </AuthMiddleware>} /> */}
+          <Route path="/chatbot" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <ChatBotList /> </AuthMiddleware>} />
           <Route path="/designchatbot" element={<DesignYourChatbot />} />
           <Route path="/createchatbot" element={<CreateChatBot />} />
           <Route path='*' element={<NotFound />} />

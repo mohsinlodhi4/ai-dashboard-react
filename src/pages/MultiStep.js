@@ -1,18 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate  } from "react-router-dom";
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getRequest, postRequest } from "../utils/api";
 import { isProtocol, isValidUrl, notifySuccess, notifyError } from "../utils/functions";
 import './Multistep.css';
+import { setUser } from "@/redux/authReducer/authSlice";
+import { useSelector, useDispatch } from "react-redux";
+
 export default function MultiStep() {
   const navigate = useNavigate();
   const formArray = [1, 2, 3];
+  const dispatch = useDispatch();
   const [formNo, setFormNo] = useState(formArray[0]);
-  const [state, setState] = useState({
-    name: "",
-    webUrl: ""
-  });
+  const user = useSelector(state=> state.auth.user)  
   const [apiData, setApiData] = useState([])
 
   const [formData, setFormData] = useState({
@@ -28,6 +28,16 @@ export default function MultiStep() {
   const [isLoading, setIsLoading] = useState(false);
   const { webUrl, businessTitle, businessDescription, businessAddress, emails, contactDetails, socialLinks, additionalInformation } = formData
 
+  const loadProfileData = async () => {
+    try {
+      let resp = await getRequest(process.env.REACT_APP_API_URL + '/api/profile/');
+      if(resp?.data?.data) {
+        setFormData(resp.data?.data);
+      }
+    }catch(e){
+      console.log("error", e);
+    }
+  }
   const inputHandle = (e) => {
     setFormData({
       ...formData,
@@ -56,8 +66,8 @@ export default function MultiStep() {
         }
         setIsLoading(true)
         try {
-          notifySuccess("Web url analyzing", "top-left")
-          const res = await postRequest("http://localhost:5000/api/profile/submit-web-url", data)
+          notifySuccess("Analyzing Web Url", "top-left")
+          const res = await postRequest(process.env.REACT_APP_API_URL + "/api/profile/submit-web-url", data)
           if (res.statusText == "OK") {
             setApiData(res?.data)
             // setFormData(res?.data?.data || {});
@@ -66,7 +76,7 @@ export default function MultiStep() {
               businessTitle: res?.data?.data?.businessTitle,
               businessDescription: res?.data?.data?.businessDescription,
               businessAddress: res?.data?.data?.addresses,
-              email: res?.data?.data?.emails,
+              emails: res?.data?.data?.emails,
               contactDetails: res.data.data.contactNumbers,
               socialLinks: [res.data.data.socialLinks],
             });
@@ -81,14 +91,16 @@ export default function MultiStep() {
 
 
     } else if (formNo === 2) {
-      if (businessTitle == '' || businessAddress == '' || emails == '' || contactDetails == '' || socialLinks == '') {
-        notifyError("Please fill required fields", "top-left")
+      // if (businessTitle == '' || businessAddress == '' || emails == '' || contactDetails == '' || socialLinks == '') {
+      if (businessTitle == '' ) {
+        // notifyError("Please fill required fields", "top-left")
+        notifyError("Business title is required", "top-left")
       } else {
         setFormNo(formNo + 1);
       }
     } else if (formNo === 3) {
       try {
-        const res = await postRequest('http://localhost:5000/api/profile/save', formData)
+        const res = await postRequest(process.env.REACT_APP_API_URL + '/api/profile/save', formData)
         if (res.statusText == "OK") {
           setFormNo(formNo + 1);
         }
@@ -100,8 +112,24 @@ export default function MultiStep() {
   const pre = () => {
     setFormNo(formNo - 1);
   };
-  const finalSubmit = () => {
-    navigate('/dashboard')
+  const finalSubmit = async () => {
+    try {
+      setIsLoading(true)
+      await postRequest(process.env.REACT_APP_API_URL + '/api/profile/mark-as-complete');
+      setIsLoading(false)
+      dispatch( 
+        setUser({
+          ...user,
+          profileCompleted: true,
+        }) 
+      )
+      navigate('/dashboard')
+
+    }catch(e) {
+      notifyError(e?.data?.message || "Something went wrong");
+      setIsLoading(false)
+    
+    }
   };
 
   const oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -112,8 +140,8 @@ export default function MultiStep() {
     form.setAttribute('action', oauth2Endpoint);
 
     const params = {
-      client_id: '194253275919-7q6a5vucqo9b84gau2ra04u51q87ndeg.apps.googleusercontent.com',
-      redirect_uri: 'http://localhost:3000/callback',
+      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || '194253275919-7q6a5vucqo9b84gau2ra04u51q87ndeg.apps.googleusercontent.com',
+      redirect_uri: process.env.REACT_APP_GOOGLE_REDIRECT_URI || 'http://localhost:3000/callback',
       response_type: 'token',
       scope: 'https://www.googleapis.com/auth/analytics.readonly',
       include_granted_scopes: 'true',
@@ -133,6 +161,8 @@ export default function MultiStep() {
     document.body.appendChild(form);
     form.submit();
   };
+
+  useEffect(()=> loadProfileData, [])
 
   return (
     <div className=" bg-gray-100 flex md:flex-row items-center flex-col h-[100vh]">
@@ -307,24 +337,36 @@ export default function MultiStep() {
 
           {formNo === 4 && (
             <div>
-              <div className="flex flex-col mb-2">
+              <div className="flex flex-col my-5">
                 <label htmlFor="district">
                   Initgrate your current digital tools
                 </label>
-              </div>
-              <div className="mt-4 gap-3 flex flex-row justify-center items-center">
-                <button
+                {/* <button
                   onClick={handleSignIn}
                   className="px-3 py-2 text-lg rounded-md w-full text-white bg-[#1C64F2]"
                 >
                   Integrate
+                </button> */}
+                <div className="mt-2">
+                  <button onClick={handleSignIn} class="shadow px-4 py-2 border flex gap-2 border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:shadow transition duration-150">
+                      <img class="w-6 h-6" src="https://www.svgrepo.com/show/475656/google-color.svg" loading="lazy" alt="google logo" />
+                      <span>Google Analytics</span>
+                  </button>
+                  </div>
+              </div>
+              <div className="mt-4 gap-3 flex flex-row justify-center items-center">
+              <button
+                  onClick={pre}
+                  className="px-3 py-2 text-lg rounded-md w-full text-white bg-[#1C64F2]"
+                >
+                  Previous
                 </button>
                 <Link className="w-full" to="/createchatbot">
                   <button
                     onClick={finalSubmit}
                     className="px-3 py-2 text-lg rounded-md w-full text-white bg-[#1C64F2]"
                   >
-                    Next
+                    Finish
                   </button>
                 </Link>
               </div>
