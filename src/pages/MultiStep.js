@@ -84,6 +84,7 @@ export default function MultiStep() {
           }
         } catch (error) {
           console.log("Error", error)
+          notifyError(error?.data?.message || "Something went wrong", "top-left")
         } finally {
           setIsLoading(false)
         }
