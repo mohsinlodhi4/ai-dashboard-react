@@ -20,6 +20,7 @@ import DesignYourChatbot from "./pages/DesignYourChatbot";
 import ChatBotList from "./pages/ChatbotList";
 import GuestMiddleware from "./middleware/GuestMiddleware";
 import AuthMiddleware from "./middleware/AuthMiddleware";
+import ChatbotPreview from "./pages/ChatbotPreview";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -62,8 +63,9 @@ function App() {
           <Route path="/history-result" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <HistoryandResult /> </AuthMiddleware>} />
           {/* <Route path="/chatbot" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <Chatbot /> </AuthMiddleware>} /> */}
           <Route path="/chatbot" element={ <AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} > <ChatBotList /> </AuthMiddleware>} />
-          <Route path="/designchatbot" element={<DesignYourChatbot />} />
-          <Route path="/createchatbot" element={<CreateChatBot />} />
+          <Route path="/createchatbot/:id?" element={<AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} >  <CreateChatBot /> </AuthMiddleware>} />
+          <Route path="/designchatbot/:id" element={<AuthMiddleware fallbackUrl={fallbackProfileURL} checkIfCanProceed={checkProfileCompleted} >  <DesignYourChatbot /> </AuthMiddleware>} />
+          <Route path="/chatbot/:id" element={  <ChatbotPreview /> } />
           <Route path='*' element={<NotFound />} />
 
         </Routes>

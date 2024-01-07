@@ -1,6 +1,11 @@
 import { toast } from 'react-toastify';
 import { store } from '@/redux/store'
 import { removeUser } from '@/redux/authReducer/authSlice';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+export const SweetAlert = withReactContent(Swal)
+
 
 export const notifySuccess = (msg, position) => {
     toast.success(msg, { position: position });
@@ -39,3 +44,9 @@ export const isValidUrl = (inputUrl = null, acceptOnly = [], notAllow = []) => {
     if (res) return true;
     return false
 }
+
+export const toTitleCase = (str)=> {
+    return str.replace(/\w\S*/g, function (word) {
+      return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
+    });
+  }

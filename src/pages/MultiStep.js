@@ -41,7 +41,7 @@ export default function MultiStep() {
   const inputHandle = (e) => {
     setFormData({
       ...formData,
-      path: e.target.value,
+      logo: e.target.value,
       url: e.target.baseURI,
     });
   };
@@ -75,7 +75,7 @@ export default function MultiStep() {
               ...formData,
               businessTitle: res?.data?.data?.businessTitle,
               businessDescription: res?.data?.data?.businessDescription,
-              businessAddress: res?.data?.data?.addresses,
+              businessAddress: res?.data?.data?.addresses?.[0],
               emails: res?.data?.data?.emails,
               contactDetails: res.data.data.contactNumbers,
               socialLinks: [res.data.data.socialLinks],
@@ -101,7 +101,7 @@ export default function MultiStep() {
       }
     } else if (formNo === 3) {
       try {
-        const res = await postRequest(process.env.REACT_APP_API_URL + '/api/profile/save', formData)
+        const res = await postRequest(process.env.REACT_APP_API_URL + '/api/profile/save', formData, false)
         if (res.statusText == "OK") {
           setFormNo(formNo + 1);
         }
@@ -314,9 +314,9 @@ export default function MultiStep() {
                   onChange={inputHandle}
                   className="mt-1  "
                   type="file"
-                  accept="image/png, image/jpeg"
-                  name="path"
-                  id="path"
+                  accept="image/*"
+                  name="logo"
+                  id="logo"
                 />
               </div>
               <div className="mt-4 gap-3 flex justify-center items-center">

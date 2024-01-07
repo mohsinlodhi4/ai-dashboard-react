@@ -1,14 +1,55 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Dashboardcomponents/Header";
 import Sidebar from "../components/Dashboardcomponents/Sidebar";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import AddIcon from "@mui/icons-material/Add";
 import InfoIcon from "@mui/icons-material/Info";
 import EditIcon from "@mui/icons-material/Edit";
+import { RemoveRedEye } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { deleteRequest, getRequest } from "../utils/api";
+import { notifyError, toTitleCase, SweetAlert } from "../utils/functions";
 
 export default function ChatBotList() {
+  const [chatbots, setChatBots] = useState([]);
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false) // loader will be implemented later
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageLimit, setPageLimit] = useState(30);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const onDelete = (id) =>{
+    SweetAlert.fire({
+      title: "Do you want to delete the chatbot?",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        SweetAlert.fire("Deleted!", "Your chatbot has been deleted", "success");
+        setChatBots(prev=> prev.filter(cb=> cb._id != id));
+        
+        deleteRequest(process.env.REACT_APP_API_URL + `/api/chatbot/delete/${id}`)
+        .catch(err=>console.log(err));
+      }
+    });
+  }
+
+  useEffect(()=>{
+    setLoading(true)
+    getRequest(process.env.REACT_APP_API_URL + `/api/chatbot/list?page=${currentPage}&limit=${pageLimit}`)
+    .then(({data})=> {
+      setChatBots(data.data.chatBots)
+      setTotalPages(data.data.totalPages)
+
+    })
+    .catch(err=>{ console.log("err", err) })
+    .finally(()=> setLoading(false))
+
+  }, [currentPage, pageLimit])
+
   return (
     <div>
       <Header />
@@ -42,7 +83,7 @@ export default function ChatBotList() {
               </h4>
             </div>
             <div className="flex flex-row items-center gap-2 lg:w-[10%] ">
-              <p className="text-[12px]">Runs Today</p>
+              <p className="text-[12px]">Status</p>
               <InfoIcon style={{ fontSize: 15 }} />
             </div>
             <div className="flex flex-row items-center gap-2 lg:w-[10%]">
@@ -58,45 +99,45 @@ export default function ChatBotList() {
               aria-labelledby="tabs-with-underline-item-1"
             >
                 {/* Row start */}
-              <div className="flex flex-col lg:flex-row items-center gap-5 py-7 border-b-[1px] border-gray-300  mx-3">
-                <div className="lg:w-[70%]">
-                  <h4 className="text-sm font-semibold pb-2  text-black">
-                    Customer Support Bot
-                  </h4>
-                  {/* <div className="flex flex-row items-center gap-3">
-                    <button className="p-1 text-[10px] font-semibold text-[#F85727] border border-[#F85727] rounded">
-                      online presence
-                    </button>
-                    <button className="p-1 text-[10px] font-semibold text-[#F85727] border border-[#F85727] rounded">
-                      online presence
-                    </button>
-                    <button className="p-1 text-[10px] font-semibold text-[#F85727] border border-[#F85727] rounded">
-                      online presence
-                    </button>
-                    <button className="p-1 text-[10px] font-semibold text-[#F85727] border border-[#F85727] rounded">
-                      online presence
-                    </button>
-                  </div> */}
-                </div>
-                <div className="flex flex-row items-center gap-2 lg:w-[10%] ">
-                  <p className="text-sm bg-green-600 text-white p-2 rounded-md">
-                    26
-                  </p>
-                </div>
-                <div className="flex flex-row items-center gap-2 lg:w-[10%]">
-                  <p className="text-sm">1.6K</p>
-                </div>
-                <div className="lg:w-[10%]">
-                  <div className="flex flex-row items-center justify-center gap-3">
-                    <div className="p-2 bg-[#F85727] text-white rounded-lg ">
-                      <EditIcon style={{ fontSize: 15 }} />
+                {
+                  chatbots.map(bot=> (
+                    <div className="flex flex-col lg:flex-row items-center gap-5 py-7 border-b-[1px] border-gray-300  mx-3">
+                      <div className="lg:w-[70%]">
+                        <h4 className="text-sm font-semibold pb-2  text-black">
+                          {bot.template.name}
+                        </h4>
+                        <div className="flex flex-row items-center gap-3">
+                          {bot.template.description}
+                          {/* <button className="p-1 text-[10px] font-semibold text-[#F85727] border border-[#F85727] rounded">
+                            online presence
+                          </button> */}
+                        </div>
+                      </div>
+                      <div className="flex flex-row items-center gap-2 lg:w-[10%] ">
+                        <p className={`text-sm text-white p-2 rounded-md ${bot.status == 'draft' ? ' bg-yellow-300' : ' bg-green-600'}`}>
+                           {toTitleCase(bot.status)}
+                        </p>
+                      </div>
+                      <div className="flex flex-row items-center gap-2 lg:w-[10%]">
+                        {/* <p className="text-sm">1.6K</p> */}
+                        <p className="text-sm">{bot.totalRuns}</p>
+                      </div>
+                      <div className="lg:w-[10%]">
+                        <div className="flex flex-row items-center justify-center gap-3">
+                          <div onClick={()=>navigate(`/chatbot/${bot._id}`)} className="p-2 bg-green-500 text-white rounded-lg cursor-pointer ">
+                            <RemoveRedEye style={{ fontSize: 15 }} />
+                          </div>
+                          <div onClick={()=>navigate(`/createchatbot/${bot._id}`)} className="p-2 bg-[#F85727] text-white rounded-lg cursor-pointer ">
+                            <EditIcon style={{ fontSize: 15 }} />
+                          </div>
+                          <div onClick={()=> onDelete(bot._id)} className="p-2 bg-[#ECECEC] text-black rounded-lg cursor-pointer ">
+                            <DeleteIcon style={{ fontSize: 15 }} />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="p-2 bg-[#ECECEC] text-black rounded-lg ">
-                      <DeleteIcon style={{ fontSize: 15 }} />
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  ))
+                }
               {/* Row end */}
               
             </div>

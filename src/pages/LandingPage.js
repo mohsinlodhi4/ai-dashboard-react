@@ -326,7 +326,7 @@ export default function LandingPage() {
           />
           <h3 className="text-2xl font-bold">Share anywhere</h3>
           <p>
-            Customize your Pickaxe's design and embed it directly onto your
+            Customize your Chatbot's design and embed it directly onto your
             website or internal dashboard.
           </p>
         </div>
@@ -338,7 +338,7 @@ export default function LandingPage() {
           />
           <h3 className="text-2xl font-bold">Monitor and improve</h3>
           <p>
-            Monitor your Pickaxe's activity. View responses, give feedback, and
+            Monitor your Chatbot's activity. View responses, give feedback, and
             continuously improve your app as you get more data.
           </p>
         </div>
