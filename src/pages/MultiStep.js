@@ -68,7 +68,6 @@ export default function MultiStep() {
         try {
           notifySuccess("Analyzing Web Url", "top-left")
           const res = await postRequest(process.env.REACT_APP_API_URL + "/api/profile/submit-web-url", data)
-          if (res.statusText == "OK") {
             setApiData(res?.data)
             // setFormData(res?.data?.data || {});
             setFormData({
@@ -81,7 +80,6 @@ export default function MultiStep() {
               socialLinks: [res.data.data.socialLinks],
             });
             setFormNo(formNo + 1);
-          }
         } catch (error) {
           console.log("Error", error)
           notifyError(error?.data?.message || "Something went wrong", "top-left")
